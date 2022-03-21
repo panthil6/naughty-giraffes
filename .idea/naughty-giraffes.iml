@@ -8,5 +8,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="bootstrap" level="application" />
+    <orderEntry type="library" name="jquery-3.2.1.slim" level="application" />
+    <orderEntry type="library" name="popper.js" level="application" />
+    <orderEntry type="library" name="sweetalert2" level="application" />
+    <orderEntry type="library" name="@metamask/detect-provider" level="application" />
+    <orderEntry type="library" name="merkletreejs" level="application" />
+    <orderEntry type="library" name="ethers-5.2.umd" level="application" />
+    <orderEntry type="library" name="keccak256" level="application" />
   </component>
 </module>

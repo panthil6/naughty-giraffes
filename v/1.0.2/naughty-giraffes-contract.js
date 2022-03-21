@@ -30,7 +30,8 @@ async function mintSale(mint_val) {
 
                     // start contract process from below
                     const naughty_g_contract = new ethers.Contract(naughty_g_contract_address, naughty_g_contract_abi, naughty_g_provider);
-                    const hash = await naughty_g_contract.connect(naughty_g_signer).mintSale(mint_val);
+                    const ngc_with_sign = await naughty_g_contract.connect(naughty_g_signer);
+
                     console.log(hash);
                     if (hash) {
                         Swal.fire('Please Check Your Inbox !!!', "The transaction has been initiated successfully! Please check metamask for the latest status of your transaction.", "success");
