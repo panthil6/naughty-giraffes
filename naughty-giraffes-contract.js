@@ -13,13 +13,16 @@ let naughty_g_provider,naughty_g_accounts,naughty_g_signer;
         $('#connect-metamask').on('click', function () {
             check_metamask_detection(true);
         });
-        $('#mint-btn').on('click',mintSale);
+        $('#mint-btn').on('click',function () {
+            let mint_val = $('#naughty-counter-input').val();
+            mintSale(mint_val);
+        });
     });
 
-    async function mintSale() {
+    async function mintSale(mint_val) {
         try {
             if (naughty_g_signer._isSigner === true) {
-                let mint_val = $('#naughty-counter-input').val();
+                
                 if (naughty_g_accounts.length > 0) {
                     const claimingAddress = keccak256(naughty_g_accounts[0]);
                     const hexProof = merkleTree.getHexProof(claimingAddress);
