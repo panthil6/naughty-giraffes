@@ -325,45 +325,46 @@ let mint_val = 0;
 $(document).ready(function () {
     $('#naughty-counter-input').val(0);
     $('#naughty-mint-up').on('click', () => {
-        setMintVal();
-        if (mint_val < max_mint_token) {
-            $('#naughty-counter-input').val(++mint_val);
-        }
+        setMintVal().then(function (){
+            if (mint_val < max_mint_token) {
+                $('#naughty-counter-input').val(++mint_val);
+            }
+        });
     });
     $('#naughty-mint-down').on('click', () => {
-        setMintVal();
-        if (mint_val > 0) {
-            $('#naughty-counter-input').val(--mint_val);
-        }
+        setMintVal().then(function (){
+            if (mint_val > 0) {
+                $('#naughty-counter-input').val(--mint_val);
+            }
+        });
     });
     $('#naughty-counter-input').change(function () {
-        setMintVal();
         const num = Number($(this).val());
-        if (num < 0) {
-            $(this).val(0);
-            mint_val = 0;
-        } else if (mint_val >= max_mint_token) {
-            $(this).val(max_mint_token);
-            mint_val = max_mint_token;
-        } else {
-            mint_val = num;
-        }
+        setMintVal().then(function(){
+            if (num < 0) {
+                $('#naughty-counter-input').val(0);
+                mint_val = 0;
+            } else if (mint_val >= max_mint_token) {
+                $('#naughty-counter-input').val(max_mint_token);
+                mint_val = max_mint_token;
+            } else {
+                mint_val = num;
+                $('#naughty-counter-input').val(num);
+            }
+        });
     });
     check_metamask_detection();
     $('#connect-metamask').on('click', function () {
         check_metamask_detection(true);
     });
     $('#mint-btn').on('click', function () {
-        setMintVal();
-        if (naughty_g_sale_stage === 'not started') {
-            Swal.fire('Error !!', 'The sale has not started yet.', 'error');
-        } else {
+        setMintVal().then(function (){
             if (mint_val > 0) {
                 mintSale();
             } else {
                 Swal.fire('Warning !!', 'Please select proper mint value.', 'warning');
             }
-        }
+        });
     });
 });
 
@@ -390,6 +391,8 @@ async function setMintVal() {
                 max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
             }
             max_mint_token = parseFloat(max_mint_token.toString());
+        }else{
+            throw "Please Connect The Wallet First.";
         }
     } catch (e) {
         if (typeof e === "string") {
@@ -410,7 +413,6 @@ async function setMintVal() {
 async function mintSale() {
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
-            setMintVal();
             if (naughty_g_sale_stage === "not started") {
                 throw "The sale has not started yet.";
             }

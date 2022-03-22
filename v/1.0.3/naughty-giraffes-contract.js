@@ -325,45 +325,46 @@ let mint_val = 0;
 $(document).ready(function () {
     $('#naughty-counter-input').val(0);
     $('#naughty-mint-up').on('click', () => {
-        setMintVal();
-        if (mint_val < max_mint_token) {
-            $('#naughty-counter-input').val(++mint_val);
-        }
+        setMintVal().then(function (){
+            if (mint_val < max_mint_token) {
+                $('#naughty-counter-input').val(++mint_val);
+            }
+        });
     });
     $('#naughty-mint-down').on('click', () => {
-        setMintVal();
-        if (mint_val > 0) {
-            $('#naughty-counter-input').val(--mint_val);
-        }
+        setMintVal().then(function (){
+            if (mint_val > 0) {
+                $('#naughty-counter-input').val(--mint_val);
+            }
+        });
     });
     $('#naughty-counter-input').change(function () {
-        setMintVal();
         const num = Number($(this).val());
-        if (num < 0) {
-            $(this).val(0);
-            mint_val = 0;
-        } else if (mint_val >= max_mint_token) {
-            $(this).val(max_mint_token);
-            mint_val = max_mint_token;
-        } else {
-            mint_val = num;
-        }
+        setMintVal().then(function(){
+            if (num < 0) {
+                $('#naughty-counter-input').val(0);
+                mint_val = 0;
+            } else if (mint_val >= max_mint_token) {
+                $('#naughty-counter-input').val(max_mint_token);
+                mint_val = max_mint_token;
+            } else {
+                mint_val = num;
+                $('#naughty-counter-input').val(num);
+            }
+        });
     });
     check_metamask_detection();
     $('#connect-metamask').on('click', function () {
         check_metamask_detection(true);
     });
     $('#mint-btn').on('click', function () {
-        setMintVal();
-        if (naughty_g_sale_stage === 'not started') {
-            Swal.fire('Error !!', 'The sale has not started yet.', 'error');
-        } else {
+        setMintVal().then(function (){
             if (mint_val > 0) {
                 mintSale();
             } else {
                 Swal.fire('Warning !!', 'Please select proper mint value.', 'warning');
             }
-        }
+        });
     });
 });
 
@@ -372,14 +373,10 @@ async function setMintVal() {
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
             let current_time = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})).getTime();
-            let pre_sale_time = new Date((new Date('Apr 27 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             let early_sale_time = new Date((new Date('Apr 28 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             let public_sale_time = new Date((new Date('Apr 29 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            max_mint_token = ethers.BigNumber.from('0');
             const NAUGHTY_G_CONTRACT = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
-            if (pre_sale_time > current_time) {
-                naughty_g_sale_stage = 'not started';
-            } else if (early_sale_time > current_time) {
+            if (early_sale_time > current_time) {
                 naughty_g_sale_stage = 'pre';
                 max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPresale();
             } else if (public_sale_time > current_time) {
@@ -390,6 +387,15 @@ async function setMintVal() {
                 max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
             }
             max_mint_token = parseFloat(max_mint_token.toString());
+            console.log({max_mint_token});
+            if (mint_val >= max_mint_token) {
+                mint_val = max_mint_token;
+            }
+            if (mint_val < 0) {
+                mint_val = 0;
+            }
+        }else{
+            throw "Please Connect The Wallet First.";
         }
     } catch (e) {
         if (typeof e === "string") {
@@ -399,21 +405,11 @@ async function setMintVal() {
             console.error(e);
         }
     }
-    if (mint_val >= max_mint_token) {
-        mint_val = max_mint_token;
-    }
-    if (mint_val < 0) {
-        mint_val = 0;
-    }
 }
 
 async function mintSale() {
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
-            setMintVal();
-            if (naughty_g_sale_stage === "not started") {
-                throw "The sale has not started yet.";
-            }
             if (naughty_g_accounts.length > 0) {
                 let hex_proof = [];
                 if (naughty_g_sale_stage === 'pre') {
@@ -423,30 +419,34 @@ async function mintSale() {
                         throw "You Don't have access yet.";
                     }
                 }
-                const NAUGHTY_G_CONTRACT = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
+                let naughty_g_contract = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
                 let sale_value = ethers.BigNumber.from('0');
                 switch (naughty_g_sale_stage) {
                     case 'pre':
-                        sale_value = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).preSalePrice();
+                        sale_value = await naughty_g_contract.connect(naughty_g_signer).preSalePrice();
+                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInPresale();
                         break;
                     case 'early':
-                        sale_value = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).earlySalePrice();
+                        sale_value = await naughty_g_contract.connect(naughty_g_signer).earlySalePrice();
+                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInEarlysale();
                         break;
                     case 'public':
-                        sale_value = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).publicSalePrice();
+                        sale_value = await naughty_g_contract.connect(naughty_g_signer).publicSalePrice();
+                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
                         break;
                     default :
                         throw "The sale has not started yet.";
                         break;
                 }
                 sale_value = parseFloat(sale_value.toString());
-                const MINT_TOKEN = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).totalNoOfTokensMintedByAddress(naughty_g_accounts[0]);
+                max_mint_token = parseFloat(max_mint_token.toString());
+                const MINT_TOKEN = await naughty_g_contract.connect(naughty_g_signer).totalNoOfTokensMintedByAddress(naughty_g_accounts[0]);
                 const ALREADY_MINTED_TOKEN = parseFloat(MINT_TOKEN.toString());
 
                 if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
                     Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
                 } else {
-                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: sale_value});
+                    const HASH = await naughty_g_contract.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: sale_value});
                     if (HASH) {
                         Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                     } else {
