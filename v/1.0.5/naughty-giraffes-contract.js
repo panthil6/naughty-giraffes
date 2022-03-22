@@ -310,15 +310,7 @@ const NAUGHTY_G_CONTRACT_ABI = [
         "type": "function"
     }
 ];
-
-const WHITELIST_ADDRESSES = [
-    "0x500c97e15be41052c0119910fa0cd8d0d24b639c"
-];
-
-const LEAF_NODES = WHITELIST_ADDRESSES.map(addr => keccak256(addr));
-const MERKLE_TREE = new MerkleTree(LEAF_NODES, keccak256, {sortPairs: true});
-const ROOT_HASH = MERKLE_TREE.getRoot();
-let max_mint_token = 0;
+let max_mint_token = 10;
 let mint_val = 0;
 
 
@@ -369,25 +361,9 @@ $(document).ready(function () {
 });
 
 async function setMintVal() {
-    naughty_g_sale_stage = 'not started';
+    naughty_g_sale_stage = 'public';
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
-            let current_time = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})).getTime();
-            let early_sale_time = new Date((new Date('Apr 28 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            let public_sale_time = new Date((new Date('Apr 29 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            const NAUGHTY_G_CONTRACT = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
-            if (early_sale_time > current_time) {
-                naughty_g_sale_stage = 'pre';
-                max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPresale();
-            } else if (public_sale_time > current_time) {
-                naughty_g_sale_stage = 'early';
-                max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInEarlysale();
-            } else {
-                naughty_g_sale_stage = 'public';
-                max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
-            }
-            max_mint_token = parseFloat(max_mint_token.toString());
-            console.log({max_mint_token});
             if (mint_val >= max_mint_token) {
                 mint_val = max_mint_token;
             }
@@ -411,48 +387,29 @@ async function mintSale() {
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
             if (naughty_g_accounts.length > 0) {
-                let hex_proof = [];
-                if (naughty_g_sale_stage === 'pre') {
-                    const CLAIMING_ADDRESS = keccak256(naughty_g_accounts[0]);
-                    hex_proof = MERKLE_TREE.getHexProof(CLAIMING_ADDRESS);
-                    if (!MERKLE_TREE.verify(hex_proof, CLAIMING_ADDRESS, ROOT_HASH)) {
-                        throw "You Don't have access yet.";
-                    }
-                }
                 let naughty_g_contract = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
                 let sale_value = ethers.BigNumber.from('0');
                 switch (naughty_g_sale_stage) {
                     case 'pre':
                         sale_value = await naughty_g_contract.connect(naughty_g_signer).preSalePrice();
-                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInPresale();
                         break;
                     case 'early':
                         sale_value = await naughty_g_contract.connect(naughty_g_signer).earlySalePrice();
-                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInEarlysale();
                         break;
                     case 'public':
                         sale_value = await naughty_g_contract.connect(naughty_g_signer).publicSalePrice();
-                        max_mint_token = await naughty_g_contract.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
                         break;
                     default :
                         throw "The sale has not started yet.";
                         break;
                 }
                 sale_value = parseFloat(sale_value.toString());
-                max_mint_token = parseFloat(max_mint_token.toString());
-                const MINT_TOKEN = await naughty_g_contract.connect(naughty_g_signer).totalNoOfTokensMintedByAddress(naughty_g_accounts[0]);
-                const ALREADY_MINTED_TOKEN = parseFloat(MINT_TOKEN.toString());
-
-                if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
-                    Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
-                } else {
-                    const HASH = await naughty_g_contract.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: sale_value});
+                    const HASH = await naughty_g_contract.connect(naughty_g_signer).mintSale(mint_val, [], {value: sale_value});
                     if (HASH) {
                         Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                     } else {
                         Swal.fire('Error !!', 'Fail to complete minting.', 'error');
                     }
-                }
             } else {
                 throw "Please Connect The Wallet First.";
             }
