@@ -345,7 +345,7 @@ $(document).ready(function () {
             if (num < 0) {
                 $('#naughty-counter-input').val(0);
                 mint_val = 0;
-            } else if (mint_val > max_mint_token) {
+            } else if (mint_val >= max_mint_token) {
                 $('#naughty-counter-input').val(max_mint_token);
                 mint_val = max_mint_token;
             } else {
