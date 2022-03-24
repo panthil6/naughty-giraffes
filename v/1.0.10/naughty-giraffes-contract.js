@@ -411,7 +411,7 @@ async function mintSale() {
                 if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
                     Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
                 } else {
-                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
+                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value).toString()});
                     if (HASH) {
                         Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                     } else {
@@ -431,7 +431,14 @@ async function mintSale() {
             if (e.message && e.message === 'MetaMask Tx Signature: User denied transaction signature.') {
                 Swal.fire({
                     title: 'Error !!',
-                    text: 'You have canceled the transaction.',
+                    text: 'Transaction Cancelled !',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else if (e.error.code === -32603 && e.error.message && e.error.message.indexOf('execution reverted:') === 0) {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: e.error.message.replace('execution reverted:', ''),
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
@@ -449,7 +456,6 @@ async function mintSale() {
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
-                console.error(e);
             }
         }
     }

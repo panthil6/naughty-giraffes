@@ -473,7 +473,14 @@ async function mintSale() {
             if (e.message && e.message === 'MetaMask Tx Signature: User denied transaction signature.') {
                 Swal.fire({
                     title: 'Error !!',
-                    text: 'You have canceled the transaction.',
+                    text: 'Transaction Cancelled !',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else if (e.error.code === -32603 && e.error.message && e.error.message.indexOf('execution reverted:') === 0) {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: e.error.message.replace('execution reverted:', ''),
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
@@ -491,7 +498,7 @@ async function mintSale() {
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
-                console.error(e);
+                // console.error(e);
             }
         }
     }
