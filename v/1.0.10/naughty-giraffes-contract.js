@@ -411,7 +411,7 @@ async function mintSale() {
                 if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
                     Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
                 } else {
-                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value).toString()});
+                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
                     if (HASH) {
                         Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                     } else {
