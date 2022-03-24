@@ -477,7 +477,7 @@ async function mintSale() {
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
-            } else if (e.message && (e.message.indexOf('insufficient funds for intrinsic transaction cost') === 0  || e.message.indexOf('insufficient funds') === 0)) {
+            } else if (e.message && (e.message.indexOf('insufficient funds for intrinsic transaction cost') === 0  || e.message.indexOf('err: insufficient funds') === 0)) {
                 Swal.fire({
                     title: 'Error !!',
                     text: 'You have insufficient funds for performing the transaction.',
