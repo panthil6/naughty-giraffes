@@ -456,6 +456,7 @@ async function mintSale() {
                     icon: 'error',
                     confirmButtonColor: '#d33'
                 });
+                console.error(e);
             }
         }
     }
