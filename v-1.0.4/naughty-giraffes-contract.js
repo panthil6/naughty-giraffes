@@ -396,9 +396,14 @@ async function setMintVal() {
         }
     } catch (e) {
         if (typeof e === "string") {
-            Swal.fire('Error !!', e, 'error');
+            Swal.fire({title: 'Error !!', text: e, icon: 'error', confirmButtonColor: '#d33'});
         } else {
-            Swal.fire('Error !!', 'Please refresh the page and try again.', 'error');
+            Swal.fire({
+                title: 'Error !!',
+                text: 'Please refresh the page and try again.',
+                icon: 'error',
+                confirmButtonColor: '#d33'
+            });
             console.error(e);
         }
     }
@@ -452,7 +457,7 @@ async function mintSale() {
                     if (HASH) {
                         Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                     } else {
-                        Swal.fire('Error !!', 'Fail to complete minting.', 'error');
+                        throw 'Fail to complete minting.';
                     }
                 }
             } else {
@@ -463,10 +468,31 @@ async function mintSale() {
         }
     } catch (e) {
         if (typeof e === "string") {
-            Swal.fire('Error !!', e, 'error');
+            Swal.fire({title: 'Error !!', text: e, icon: 'error', confirmButtonColor: '#d33'});
         } else {
-            Swal.fire('Error !!', 'Please refresh the page and try again.', 'error');
-            console.error(e);
+            if (e.message && e.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'You have canceled the transaction.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else if (e.message && e.message.indexOf('insufficient funds for intrinsic transaction cost') === 0) {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'You have insufficient funds for performing the transaction.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'Please refresh the page and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+                console.error(e);
+            }
         }
     }
 }

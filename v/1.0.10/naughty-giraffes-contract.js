@@ -426,12 +426,29 @@ async function mintSale() {
         }
     } catch (e) {
         if (typeof e === "string") {
-            Swal.fire({title:'Error !!',text: e, icon:'error',confirmButtonColor: '#d33'});
+            Swal.fire({title: 'Error !!', text: e, icon: 'error', confirmButtonColor: '#d33'});
         } else {
-            if(e.message && e.message === 'MetaMask Tx Signature: User denied transaction signature.'){
-                Swal.fire({title:'Error !!',text: 'You have canceled the transaction.', icon:'error',confirmButtonColor: '#d33'});
-            }else {
-                Swal.fire({title:'Error !!',text: 'Please refresh the page and try again.', icon:'error',confirmButtonColor: '#d33'});
+            if (e.message && e.message === 'MetaMask Tx Signature: User denied transaction signature.') {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'You have canceled the transaction.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else if (e.message && e.message.indexOf('insufficient funds for intrinsic transaction cost') === 0) {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'You have insufficient funds for performing the transaction.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error !!',
+                    text: 'Please refresh the page and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
                 console.error(e);
             }
         }
