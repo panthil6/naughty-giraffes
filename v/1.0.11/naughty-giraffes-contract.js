@@ -146,9 +146,10 @@ async function mintSale() {
                         break;
                 }
                 sale_value = parseFloat(sale_value.toString());
+                console.log("mint_token",{sale_value});
                 const MINT_TOKEN = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).totalNoOfTokensMintedByAddress(naughty_g_accounts[0]);
                 const ALREADY_MINTED_TOKEN = parseFloat(MINT_TOKEN.toString());
-
+                console.log({ALREADY_MINTED_TOKEN});
                 if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
                     Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
                 } else {
