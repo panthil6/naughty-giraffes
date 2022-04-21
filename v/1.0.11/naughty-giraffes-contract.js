@@ -13,13 +13,13 @@ const MERKLE_TREE = new MerkleTree(LEAF_NODES, keccak256, {sortPairs: true});
 const ROOT_HASH = MERKLE_TREE.getRoot();
 let max_mint_token = 0;
 let mint_val = 0;
+let saleDate = {
+    pre : 'April 18',
+    early: 'April 20',
+    public: 'April 28'
+}
 
 $(document).ready(function () {
-    console.log({
-        pre : 'April 20',
-        early: 'April 25',
-        public: 'April 28'
-    });
     $('#naughty-counter-input').val(0);
     $('#naughty-mint-up').on('click', () => {
         setMintVal().then(function () {
@@ -70,9 +70,9 @@ async function setMintVal() {
     try {
         if (typeof naughty_g_signer != "undefined" && typeof naughty_g_signer._isSigner != "undefined" && naughty_g_signer._isSigner === true) {
             let current_time = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})).getTime();
-            let pre_sale_time = new Date((new Date('April 20 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            let early_sale_time = new Date((new Date('April 25 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            let public_sale_time = new Date((new Date('April 28 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let pre_sale_time = new Date((new Date(saleDate.pre + ' 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let early_sale_time = new Date((new Date(saleDate.early + ' 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let public_sale_time = new Date((new Date(saleDate.public + ' 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             max_mint_token = ethers.BigNumber.from('0');
             const NAUGHTY_G_CONTRACT = new ethers.Contract(NAUGHTY_G_CONTRACT_ADDRESS, NAUGHTY_G_CONTRACT_ABI, naughty_g_provider);
             if (pre_sale_time > current_time) {
