@@ -147,20 +147,11 @@ async function mintSale() {
                         break;
                 }
                 sale_value = parseFloat(sale_value.toString());
-                console.log("mint_token",{sale_value});
-                const MINT_TOKEN = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).totalNoOfTokensMintedByAddress(naughty_g_accounts[0]);
-                const ALREADY_MINTED_TOKEN = parseFloat(MINT_TOKEN.toString());
-                console.log({ALREADY_MINTED_TOKEN});
-                if (ALREADY_MINTED_TOKEN + mint_val > max_mint_token) {
-                    Swal.fire('Warning !!', 'You may have exceeded the mint limit, Max mint limit for ' + naughty_g_sale_stage + ' sale is ' + max_mint_token, 'warning');
+                const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
+                if (HASH) {
+                    Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
                 } else {
-                    console.log(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
-                    const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
-                    if (HASH) {
-                        Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
-                    } else {
-                        throw 'Fail to complete minting.';
-                    }
+                    throw 'Fail to complete minting.';
                 }
             } else {
                 throw "Please Connect The Wallet First.";
