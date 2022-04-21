@@ -15,7 +15,6 @@ let max_mint_token = 0;
 let mint_val = 0;
 
 $(document).ready(function () {
-    console.log({ROOT_HASH},ROOT_HASH,{MERKLE_TREE});
     console.log({
         pre : 'April 20',
         early: 'April 25',
