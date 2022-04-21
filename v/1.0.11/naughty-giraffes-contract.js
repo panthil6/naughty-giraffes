@@ -4,7 +4,8 @@ const NAUGHTY_G_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","typ
 
 const WHITELIST_ADDRESSES = [
     "0x6201B5f51D3ba9aE95B98BE73717AB53ae05E1D0",
-    "0x86FfcC4DFb261788Ca5B8F60dE6Aa9f4666Cc8f7"
+    "0x86FfcC4DFb261788Ca5B8F60dE6Aa9f4666Cc8f7",
+    "0x21615B787b3D82b89074aaD1DEC6b647696fa2D0"    //Dev
 ];
 
 const LEAF_NODES = WHITELIST_ADDRESSES.map(addr => keccak256(addr));
