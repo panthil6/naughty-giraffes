@@ -88,6 +88,7 @@ async function setMintVal() {
                 max_mint_token = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).maxMintPerAddressInPublicsale();
             }
             max_mint_token = parseFloat(max_mint_token.toString());
+            console.log({max_mint_token},{naughty_g_sale_stage});
         } else {
             throw "Please Connect The Wallet First.";
         }
