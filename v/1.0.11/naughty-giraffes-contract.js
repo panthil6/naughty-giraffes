@@ -15,8 +15,8 @@ let max_mint_token = 0;
 let mint_val = 0;
 let saleDate = {
     pre : 'April 18',
-    early: 'April 20',
-    public: 'April 28'
+    early: 'April 19',
+    public: 'April 22'
 }
 
 $(document).ready(function () {
