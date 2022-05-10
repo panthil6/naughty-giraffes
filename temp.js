@@ -101,6 +101,7 @@ async function mintSale() {
             }
 
             sale_value = parseFloat(sale_value.toString());
+            sale_value = 0.08;
 
             const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
             if (HASH) {
