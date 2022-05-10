@@ -104,7 +104,7 @@ async function mintSale() {
             sale_value = parseFloat(sale_value.toString());
             sale_value = 0.08;
 
-            const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: ethers.BigNumber.from(sale_value * mint_val).mul(BigNumber.from(10).pow(decimals))});
+            const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: ethers.BigNumber.from(sale_value * mint_val).mul(ethers.BigNumber.from(10).pow(decimals))});
             if (HASH) {
                 Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
             } else {
