@@ -113,6 +113,7 @@ async function mintSale() {
             throw "Please Connect The Wallet First.";
         }
     } catch (e) {
+        console.log({e});
         if (typeof e === "string") {
             Swal.fire({title: 'Error !!', text: e, icon: 'error', confirmButtonColor: '#d33'});
         } else {
