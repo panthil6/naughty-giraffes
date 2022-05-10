@@ -8,6 +8,7 @@ const LEAF_NODES = WHITELIST_ADDRESSES.map(addr => keccak256(addr));
 const MERKLE_TREE = new MerkleTree(LEAF_NODES, keccak256, {sortPairs: true});
 const ROOT_HASH = MERKLE_TREE.getRoot();
 let mint_val = 0;
+const decimals = 18;
 
 async function connect_to_metamask() {
     naughty_g_provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -103,7 +104,7 @@ async function mintSale() {
             sale_value = parseFloat(sale_value.toString());
             sale_value = 0.08;
 
-            const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: (sale_value * mint_val).toString()});
+            const HASH = await NAUGHTY_G_CONTRACT.connect(naughty_g_signer).mintSale(mint_val, hex_proof, {value: ethers.BigNumber.from(sale_value * mint_val).mul(BigNumber.from(10).pow(decimals))});
             if (HASH) {
                 Swal.fire('Success !!!', "The transaction has been completed successfully! Please check metamask for the latest status of your transaction.", "success");
             } else {
