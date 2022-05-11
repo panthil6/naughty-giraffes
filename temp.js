@@ -8,40 +8,20 @@ const LEAF_NODES = WHITELIST_ADDRESSES.map(addr => keccak256(addr));
 const MERKLE_TREE = new MerkleTree(LEAF_NODES, keccak256, {sortPairs: true});
 let mint_val = 0;
 
-async function connect_to_metamask() {
-    naughty_g_provider = new ethers.providers.Web3Provider(window.ethereum);
-    try {
-        naughty_g_accounts = await naughty_g_provider.send("eth_requestAccounts", []);
-        naughty_g_signer = naughty_g_provider.getSigner();
-        if (naughty_g_signer._isSigner) {
+async function check_metamask_detection(connect = false) {
+    let detectEthereum = await detectEthereumProvider();
+    if (detectEthereum) {
+        if(window.ethereum.selectedAddress == null && !connect){
+            $('#connect-metamask').removeClass('d-none');
+        }else{
+            naughty_g_accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+            naughty_g_provider = new ethers.providers.Web3Provider(window.ethereum);
+            naughty_g_signer = naughty_g_provider.getSigner();
             let account = naughty_g_accounts[0];
             account = account.substring(0,4)+'...'+account.substring(account.length-4);
             $('#acc-id').text(account.toUpperCase());
             $('#wallet-connected').removeClass('d-none');
             $('#connect-metamask').addClass('d-none');
-            $('#get-metamask').addClass('d-none');
-        } else {
-            $('#wallet-connected').addClass('d-none');
-            check_metamask_detection();
-        }
-    } catch (e) {
-        check_metamask_detection();
-    }
-}
-
-async function check_metamask_detection(connect = false) {
-    let detectEthereum = await detectEthereumProvider();
-    $('#connect-metamask').addClass('d-none');
-    $('#get-metamask').addClass('d-none');
-    $('#wallet-connected').addClass('d-none');
-    if (detectEthereum && window.ethereum) {
-        if (window.ethereum.isMetaMask) {
-            $('#connect-metamask').removeClass('d-none');
-            if (connect) {
-                connect_to_metamask();
-            }
-        } else {
-            $('#get-metamask').removeClass('d-none');
         }
     } else {
         $('#get-metamask').removeClass('d-none');
@@ -88,8 +68,8 @@ async function mintSale() {
             let sale_value = ethers.BigNumber.from('0');
             let hex_proof = [];
             let current_time = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})).getTime();
-            let pre_sale_time = new Date((new Date('May 09 7:05:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
-            let early_sale_time = new Date((new Date('May 10 7:05:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let pre_sale_time = new Date((new Date('May 09 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let early_sale_time = new Date((new Date('May 10 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             let public_sale_time = new Date((new Date('May 11 7:05:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
 
             if (pre_sale_time > current_time) {
@@ -114,7 +94,6 @@ async function mintSale() {
             throw "Please Connect The Wallet First.";
         }
     } catch (e) {
-        console.log({e});
         if (typeof e === "string") {
             Swal.fire({title: 'Error !!', text: e, icon: 'error', confirmButtonColor: '#d33'});
         } else {
