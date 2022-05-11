@@ -17,14 +17,23 @@ async function check_metamask_detection(connect = false) {
             naughty_g_accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
             naughty_g_provider = new ethers.providers.Web3Provider(window.ethereum);
             naughty_g_signer = naughty_g_provider.getSigner();
-            let account = naughty_g_accounts[0];
-            account = account.substring(0,4)+'...'+account.substring(account.length-4);
-            $('#acc-id').text(account.toUpperCase());
+            updateAccountBtn(naughty_g_accounts);
             $('#wallet-connected').removeClass('d-none');
             $('#connect-metamask').addClass('d-none');
         }
     } else {
         $('#get-metamask').removeClass('d-none');
+    }
+}
+
+function updateAccountBtn(accountArr) {
+    if(accountArr.length > 0) {
+        let account = accountArr[0];
+        account = account.substring(0, 4) + '...' + account.substring(account.length - 4);
+        $('#acc-id').text(account.toUpperCase());
+    }else{
+        $('#connect-metamask').removeClass('d-none');
+        $('#wallet-connected').addClass('d-none');
     }
 }
 
@@ -59,6 +68,11 @@ $(document).ready(function () {
             Swal.fire('Warning !!', 'Please select proper mint value.', 'warning');
         }
     });
+    if(window.ethereum !== undefined){
+        window.ethereum.on('accountsChanged', function (accounts) {
+            updateAccountBtn(accounts)
+        });
+    }
 });
 
 async function mintSale() {
