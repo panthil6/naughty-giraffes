@@ -33,6 +33,7 @@ async function check_metamask_detection(connect = false) {
     let detectEthereum = await detectEthereumProvider();
     $('#connect-metamask').addClass('d-none');
     $('#get-metamask').addClass('d-none');
+    $('#wallet-connected').addClass('d-none');
     if (detectEthereum && window.ethereum) {
         if (window.ethereum.isMetaMask) {
             $('#connect-metamask').removeClass('d-none');
