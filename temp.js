@@ -14,6 +14,9 @@ async function connect_to_metamask() {
         naughty_g_accounts = await naughty_g_provider.send("eth_requestAccounts", []);
         naughty_g_signer = naughty_g_provider.getSigner();
         if (naughty_g_signer._isSigner) {
+            let account = naughty_g_accounts[0];
+            account = account.substring(0,4)+'...'+account.substring(account.length-4);
+            $('#acc-id').text(account.toUpperCase());
             $('#wallet-connected').removeClass('d-none');
             $('#connect-metamask').addClass('d-none');
             $('#get-metamask').addClass('d-none');
