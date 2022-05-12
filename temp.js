@@ -85,7 +85,7 @@ async function mintSale() {
             let sale_value = ethers.BigNumber.from('0');
             let hex_proof = [];
             let current_time = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})).getTime();
-            let pre_sale_time = new Date((new Date('May 12 05:58:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
+            let pre_sale_time = new Date((new Date('May 12 14:30:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             let early_sale_time = new Date((new Date('May 13 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
             let public_sale_time = new Date((new Date('May 14 14:30:00 UTC 2022').toLocaleString('en-US', {timeZone: 'America/New_York'}))).getTime();
 
